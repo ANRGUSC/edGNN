@@ -1,2 +1,2 @@
-include app/config_files/*.json
-include app/model
+include gcnsched/config_files/*.json
+include gcnsched/model

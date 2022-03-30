@@ -27,8 +27,18 @@ class App:
         if early_stopping:
             self.early_stopping = EarlyStopping(patience=100, verbose=True)
 
-    def train(self, data, model_config, learning_config, save_path='', mode=NODE_CLASSIFICATION):
+    def create_model(self, data, model_config, learning_config, mode=NODE_CLASSIFICATION) -> Model:
+        return Model(
+            g=data[GRAPH],
+            config_params=model_config,
+            n_classes=data[N_CLASSES],
+            n_rels=data[N_RELS] if N_RELS in data else None,
+            n_entities=data[N_ENTITIES] if N_ENTITIES in data else None,
+            is_cuda=learning_config['cuda'],
+            mode=mode
+        )
 
+    def train(self, data, model_config, learning_config, save_path='', mode=NODE_CLASSIFICATION):
         loss_fcn = torch.nn.CrossEntropyLoss()
 
         labels = data[LABELS]
@@ -38,14 +48,10 @@ class App:
             val_mask = data[VAL_MASK]
             dur = []
 
-            # create GNN model
-            self.model = Model(g=data[GRAPH],
-                               config_params=model_config,
-                               n_classes=data[N_CLASSES],
-                               n_rels=data[N_RELS] if N_RELS in data else None,
-                               n_entities=data[N_ENTITIES] if N_ENTITIES in data else None,
-                               is_cuda=learning_config['cuda'],
-                               mode=mode)
+            self.model = self.create_model(
+                data, model_config, learning_config, 
+                mode=mode
+            )
 
             optimizer = torch.optim.Adam(self.model.parameters(),
                                          lr=learning_config['lr'],

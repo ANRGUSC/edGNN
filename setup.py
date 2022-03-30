@@ -123,8 +123,6 @@ class develop(_develop):
         _develop.run(self)
 
 
-scripts = ['bin/run_model', 'bin/preprocess']
-
 setup(
     name='edGNN',
     version='0.0.1',
@@ -133,9 +131,8 @@ setup(
     url='UNK',
     author='anonymous',
     author_email='anonymous',
-    packages=['edgnn'],
+    packages=['edgnn', 'gcnsched'],
     zip_safe=False,
-    scripts=scripts,
     install_requires=PYPI_REQUIREMENTS,
     include_package_data=True,
     cmdclass={

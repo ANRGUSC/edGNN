@@ -1,6 +1,6 @@
 from tempfile import TemporaryDirectory
 from edgnn.core.data.dglrgcn import preprocess_dglrgcn
-from edgnn.run_model import run_model
+from gcnsched.run_model import run_model
 import pathlib 
 
 thisdir = pathlib.Path(__file__).resolve().parent

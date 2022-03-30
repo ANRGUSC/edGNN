@@ -13,13 +13,13 @@ from dgl.data import DGLDataset, register_data_args
 from heft.core import schedule
 from sklearn import preprocessing
 
-from .core.app import App
-from .core.data.constants import GRAPH, N_CLASSES, N_ENTITIES, N_RELS
-from .core.models.constants import (AIFB, GRAPH_CLASSIFICATION, MUTAG,
+from edgnn.core.app import App
+from edgnn.core.data.constants import GRAPH, N_CLASSES, N_ENTITIES, N_RELS
+from edgnn.core.models.constants import (AIFB, GRAPH_CLASSIFICATION, MUTAG,
                                     MUTAGENICITY, NODE_CLASSIFICATION, PTC_FM,
                                     PTC_FR, PTC_MM, PTC_MR)
-from .utils.inits import to_cuda
-from .utils.io import create_default_path, print_graph_stats, read_params
+from edgnn.utils.inits import to_cuda
+from edgnn.utils.io import create_default_path, print_graph_stats, read_params
 
 ## from TP HEFT
 def face_recognition_task_graph():
