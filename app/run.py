@@ -10,7 +10,6 @@ def main():
         path = pathlib.Path(tmp)
         preprocessed_graphs = path.joinpath("preprocessed_graphs", "aifb")
         preprocessed_graphs.mkdir(exist_ok=True, parents=True)
-        print(preprocessed_graphs.is_dir())
         preprocess_dglrgcn(
             dataset="aifb",
             out_folder=str(preprocessed_graphs),
@@ -22,11 +21,9 @@ def main():
             arg_dataset="aifb",
             arg_config_fpath=str(config_path),
             arg_data_path=str(preprocessed_graphs),
-            # arg_gpu=,
             arg_lr=0.005,
             arg_n_epochs=400,
-            arg_weight_decay=0,
-            # arg_batch_size=
+            arg_weight_decay=0
         )
 
 

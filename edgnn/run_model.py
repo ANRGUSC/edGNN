@@ -1,6 +1,7 @@
 import argparse
 import copy
 import importlib
+import pathlib
 import random
 import time
 
@@ -19,7 +20,6 @@ from .core.models.constants import (AIFB, GRAPH_CLASSIFICATION, MUTAG,
                                     PTC_FR, PTC_MM, PTC_MR)
 from .utils.inits import to_cuda
 from .utils.io import create_default_path, print_graph_stats, read_params
-
 
 ## from TP HEFT
 def face_recognition_task_graph():
@@ -1117,6 +1117,9 @@ def run_model(arg_config_fpath: str,
     prob = 0.3
     num_graphs_inference = 1
     min_deg,max_deg,min_width,max_width,depth = 3,4,5,5,9
+
+    # Save mode
+    torch.save(app.model.state_dict(), pathlib.Path.cwd().joinpath("model"))
 
     print("-------------------------- FACE Recognition -----------------------")
     dataset_SMALL = KarateClubDataset(num_node,num_of_all_machines,num_graphs_inference,prob,min_deg,max_deg,min_width,max_width,depth,
