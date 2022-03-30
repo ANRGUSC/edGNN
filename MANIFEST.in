@@ -1,1 +1,2 @@
-include **/*.json
+include app/config_files/*.json
+include app/model
