@@ -4,7 +4,7 @@ import os
 import sys
 import subprocess
 import traceback
-from setuptools import setup, find_packages, Command
+from setuptools import setup, Command
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from setuptools.command.develop import develop as _develop
 from distutils.command.build import build as _build
@@ -133,10 +133,11 @@ setup(
     url='UNK',
     author='anonymous',
     author_email='anonymous',
-    packages=find_packages('.'),
+    packages=['edgnn'],
     zip_safe=False,
     scripts=scripts,
     install_requires=PYPI_REQUIREMENTS,
+    include_package_data=True,
     cmdclass={
         'bdist_egg': bdist_egg,
         'build': build,

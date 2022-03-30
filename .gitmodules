@@ -1,0 +1,3 @@
+[submodule "heft"]
+	path = heft
+	url = https://github.com/ANRGUSC/heft.git

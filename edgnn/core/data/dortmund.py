@@ -6,11 +6,11 @@ import numpy as np
 
 from dgl import DGLGraph
 
-from core.data.constants import GRAPH, LABELS, N_CLASSES, N_RELS, N_ENTITIES
-from core.models.constants import GNN_NODE_LABELS_KEY, GNN_NODE_ATTS_KEY, GNN_EDGE_FEAT_KEY
-from core.models.constants import GNN_EDGE_LABELS_KEY, GNN_EDGE_NORM
-import core.data.utils as utils
-from core.data.utils import complete_path
+from edgnn.core.data.constants import GRAPH, LABELS, N_CLASSES, N_RELS, N_ENTITIES
+from edgnn.core.models.constants import GNN_NODE_LABELS_KEY, GNN_NODE_ATTS_KEY, GNN_EDGE_FEAT_KEY
+from edgnn.core.models.constants import GNN_EDGE_LABELS_KEY, GNN_EDGE_NORM
+import edgnn.core.data.utils as utils
+from edgnn.core.data.utils import complete_path
 
 ADJACENCY_SUFFIX = '_A.txt'
 GRAPH_ID_SUFFIX = '_graph_indicator.txt'

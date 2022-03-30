@@ -5,9 +5,9 @@ from distutils.util import strtobool
 from dgl.contrib.data import load_data
 from dgl import DGLGraph
 
-from core.data.constants import GRAPH, LABELS, TRAIN_MASK, TEST_MASK, VAL_MASK, N_RELS, N_CLASSES
-from core.models.constants import GNN_EDGE_LABELS_KEY, GNN_EDGE_NORM
-from core.data.utils import complete_path, load_pickle, save_pickle
+from edgnn.core.data.constants import GRAPH, LABELS, TRAIN_MASK, TEST_MASK, VAL_MASK, N_RELS, N_CLASSES
+from edgnn.core.models.constants import GNN_EDGE_LABELS_KEY, GNN_EDGE_NORM
+from edgnn.core.data.utils import complete_path, load_pickle, save_pickle
 
 
 def preprocess_dglrgcn(*, dataset, out_folder, bfs_level=3, relabel=False, reverse_edges=False):

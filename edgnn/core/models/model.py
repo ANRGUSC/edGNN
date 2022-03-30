@@ -9,10 +9,10 @@ import torch.nn.functional as F
 
 import dgl
 from dgl import DGLGraph
-from core.utils import compute_node_degrees
-from core.models.constants import NODE_CLASSIFICATION, GRAPH_CLASSIFICATION, GNN_EDGE_LABELS_KEY, GNN_NODE_LABELS_KEY
+from ..utils import compute_node_degrees
+from ..models.constants import NODE_CLASSIFICATION, GRAPH_CLASSIFICATION, GNN_EDGE_LABELS_KEY, GNN_NODE_LABELS_KEY
 
-MODULE = "core.models.layers.{}"
+MODULE = "edgnn.core.models.layers.{}"
 LAYER_MODULES = {
     'edGNNLayer': 'edgnn',
     'RGCNLayer': 'rgcn'
@@ -21,7 +21,9 @@ LAYER_MODULES = {
 ACTIVATIONS = {
     'relu': F.relu
 }
+##########
 
+##########
 
 def layer_build_args(node_dim, edge_dim, n_classes, layer_params, mode):
     """
@@ -91,7 +93,7 @@ class Model(nn.Module):
         self.n_classes = n_classes
         self.n_entities = n_entities
         self.g = g
-
+        #print("G in MODEL",type(g),g)
         layer_type = config_params["layer_type"]
 
         module = importlib.import_module(MODULE.format(LAYER_MODULES[layer_type]))
@@ -179,6 +181,7 @@ class Model(nn.Module):
 
         # 2. Build edge features
         if isinstance(self.embed_edges, nn.Embedding):
+            #print("self.g.edata[GNN_EDGE_LABELS_KEY]",type(self.g.edata[GNN_EDGE_LABELS_KEY]),self.g.edata[GNN_EDGE_LABELS_KEY])
             edge_features = self.embed_edges(self.g.edata[GNN_EDGE_LABELS_KEY])
         elif isinstance(self.embed_edges, torch.Tensor):
             edge_features = self.embed_edges[self.g.edata[GNN_EDGE_LABELS_KEY]]
@@ -209,23 +212,137 @@ class Model(nn.Module):
 
     def eval_node_classification(self, labels, mask):
         self.eval()
+        # m = torch.nn.LogSoftmax(dim=1)
+        # loss_fcn = torch.nn.NLLLoss()
         loss_fcn = torch.nn.CrossEntropyLoss()
         with torch.no_grad():
             logits = self(None)
             logits = logits[mask]
             labels = labels[mask]
+            #loss = loss_fcn(m(logits), labels)
             loss = loss_fcn(logits, labels)
             _, indices = torch.max(logits, dim=1)
             correct = torch.sum(indices == labels)
+            print("(model)->(node_eval_class)",labels)
             return correct.item() * 1.0 / len(labels), loss
 
-    def eval_graph_classification(self, labels, testing_graphs):
+    ####
+    def get_predicted_labels(self, labels, mask):
+        self.eval()
+        #m = torch.nn.LogSoftmax(dim=1)
+        #loss_fcn = torch.nn.NLLLoss()
+        
+        loss_fcn = torch.nn.CrossEntropyLoss()
+        with torch.no_grad():
+            logits = self(None)
+            logits = logits[mask]
+            labels = labels[mask]
+            _, indices = torch.max(logits, dim=1)
+            print("Before---",indices)
+            #loss = loss_fcn(m(logits), labels)
+            loss = loss_fcn(logits, labels)
+            _, indices = torch.max(logits, dim=1)
+            correct = torch.sum(indices == labels)
+            print("After---",indices)
+            #print("-labels",labels)
+            return indices
+
+    def get_predicted_labels_for(self):
         self.eval()
         loss_fcn = torch.nn.CrossEntropyLoss()
         with torch.no_grad():
+            logits = self(None)
+            logits = logits
+            _, indices = torch.max(logits, dim=1)
+            print("After---",indices)
+            return indices
+
+
+        # self.eval()
+        # loss_fcn = torch.nn.CrossEntropyLoss()
+        # with torch.no_grad():
+        #     logits = self(None)
+            
+        #     _, indices = torch.max(logits, dim=1)
+        #     return indices
+
+
+    def JUST_forward(self, g):
+
+        if g is not None:
+            g.set_n_initializer(dgl.init.zero_initializer)
+            g.set_e_initializer(dgl.init.zero_initializer)
+            self.g = g
+
+        # 1. Build node features
+        if isinstance(self.embed_nodes, nn.Embedding):
+
+            # print("aloooo",self.g.ndata['hn_in'].shape[0])
+            # initial_labeling_nodes = torch.as_tensor([x for x in range(self.g.ndata['hn_in'].shape[0])])
+            # node_features = self.embed_nodes(initial_labeling_nodes)
+            # node_features.data = self.g.ndata['hn_in']
+            
+            #print("before change ==== node_features******",node_features)
+            node_features = self.g.ndata['hnl']
+            node_features.data = self.g.ndata['hn_in']
+            #print("AFTER change ==== node_features******",node_features,'original\n',self.g.ndata['hn_in'])
+            #print(dir(node_features))
+            #print("type(node_features)",node_features,'\n',self.g.ndata['hnl'])
+
+        elif isinstance(self.embed_nodes, torch.Tensor):
+            node_features = self.embed_nodes[self.g.ndata['hnl']]
+        else:
+            node_features = torch.zeros(self.g.number_of_nodes(), self.node_dim)
+        node_features = node_features.cuda() if self.is_cuda else node_features
+
+        # 2. Build edge features
+        if isinstance(self.embed_edges, nn.Embedding):
+            # print("self.g.edata[GNN_EDGE_LABELS_KEY]",type(self.g.edata[GNN_EDGE_LABELS_KEY]),self.g.edata[GNN_EDGE_LABELS_KEY])
+            # print("self.g.edata['he']",self.g.edata['he'].shape)
+            # initial_labeling_edges = torch.as_tensor([x for x in range(self.g.edata['he'].shape[0])])
+            # edge_features = self.embed_nodes(initial_labeling_edges)
+            # edge_features.data = self.g.edata['he']
+
+            edge_features = self.embed_edges(self.g.edata['hel'])
+            edge_features.data = self.g.edata['he']
+            
+        elif isinstance(self.embed_edges, torch.Tensor):
+            edge_features = self.embed_edges[self.g.edata['hel']]
+        else:
+            edge_features = None
+
+        # 3. Iterate over each layer
+        for layer_idx, layer in enumerate(self.layers):
+            if layer_idx == 0:
+                h = layer(node_features, edge_features, self.g)
+                self.g.ndata['h_0'] = h
+            else:
+                h = layer(h, edge_features, self.g)
+                key = 'h_' + str(layer_idx)
+                self.g.ndata[key] = h
+
+        # 4.1 If node classification, return node embeddings
+        if self.mode == NODE_CLASSIFICATION:
+            return h
+
+        # 4.2 If graph classification, construct readout function
+        h_g = torch.Tensor().cuda() if self.is_cuda else torch.Tensor()
+        for i in range(len(self.layers)):
+            key = 'h_' + str(i)
+            h_g = torch.cat((h_g, dgl.sum_nodes(g, key)), dim=1)
+        h_g = self.readout(h_g)
+        return h_g
+
+    ####
+    def eval_graph_classification(self, labels, testing_graphs):
+        self.eval()
+        # m = torch.nn.LogSoftmax(dim=1)
+        # loss_fcn = torch.nn.NLLLoss()
+        loss_fcn = torch.nn.CrossEntropyLoss()
+        with torch.no_grad():
             logits = self(testing_graphs)
+            #loss = loss_fcn(m(logits), labels)
             loss = loss_fcn(logits, labels)
             _, indices = torch.max(logits, dim=1)
             correct = torch.sum(indices == labels)
             return correct.item() * 1.0 / len(labels), loss
-

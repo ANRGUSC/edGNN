@@ -4,12 +4,12 @@ edGNN layer (add link to the paper)
 import torch
 import torch.nn as nn
 
-from utils.inits import reset
-from utils.inits import init_weights
-from core.utils import reset_graph_features
+from edgnn.utils.inits import reset
+from edgnn.utils.inits import init_weights
+from edgnn.core.utils import reset_graph_features
 
-from core.models.constants import GNN_MSG_KEY, GNN_NODE_FEAT_IN_KEY, GNN_NODE_FEAT_OUT_KEY
-from core.models.constants import GNN_EDGE_FEAT_KEY, GNN_AGG_MSG_KEY
+from edgnn.core.models.constants import GNN_MSG_KEY, GNN_NODE_FEAT_IN_KEY, GNN_NODE_FEAT_OUT_KEY
+from edgnn.core.models.constants import GNN_EDGE_FEAT_KEY, GNN_AGG_MSG_KEY
 
 
 class edGNNLayer(nn.Module):

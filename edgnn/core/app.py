@@ -6,13 +6,13 @@ from torch.utils.data import DataLoader
 import random
 from sklearn.model_selection import KFold
 
-from utils.early_stopping import EarlyStopping
-from utils.io import load_checkpoint
+from ..utils.early_stopping import EarlyStopping
+from ..utils.io import load_checkpoint
 
-from core.data.constants import LABELS, TRAIN_MASK, TEST_MASK, VAL_MASK, GRAPH
-from core.models.constants import NODE_CLASSIFICATION, GRAPH_CLASSIFICATION
-from core.models.model import Model
-from core.data.constants import GRAPH, N_RELS, N_CLASSES, N_ENTITIES
+from .data.constants import LABELS, TRAIN_MASK, TEST_MASK, VAL_MASK, GRAPH
+from .models.constants import NODE_CLASSIFICATION, GRAPH_CLASSIFICATION
+from .models.model import Model
+from .data.constants import GRAPH, N_RELS, N_CLASSES, N_ENTITIES
 
 
 def collate(samples):
@@ -89,7 +89,7 @@ class App:
             kf = KFold(n_splits=num_folds)
 
             for k, (train_index, test_index) in enumerate(kf.split(graphs)):
-
+                print('\n\n\ntrain_index',train_index,type(train_index))
                 # create GNN model
                 self.model = Model(g=data[GRAPH],
                                    config_params=model_config,
@@ -192,9 +192,43 @@ class App:
             test_mask = data[TEST_MASK]
             labels = data[LABELS]
             acc, _ = self.model.eval_node_classification(labels, test_mask)
+            ###
+            predicted_labels = self.model.get_predicted_labels(labels, test_mask)
+            #print(list(predicted_labels.size())[0])
+            _,golden_labels_test = torch.split(labels,[list(labels.size())[0]-list(predicted_labels.size())[0], list(predicted_labels.size())[0]])
+            #print("IN APP\n",labels,'\n',predicted_labels)
+            print("IN TEST FUNC--> predicted\n", self.model.get_predicted_labels(labels, test_mask))
+            ###
         else:
             acc = np.mean(self.accuracies)
 
         print("\nTest Accuracy {:.4f}".format(acc))
 
-        return acc
+        return acc,predicted_labels,golden_labels_test
+
+
+    # def get_prediction(self, data, load_path='', mode=NODE_CLASSIFICATION):
+
+    #     try:
+    #         print('*** Load pre-trained model ***')
+    #         self.model = load_checkpoint(self.model, load_path)
+    #     except ValueError as e:
+    #         print('Error while loading the model.', e)
+
+    #     if mode == NODE_CLASSIFICATION:
+    #         test = data
+    #         labels = data[LABELS]
+    #         acc, _ = self.model.eval_node_classification(labels, test_mask)
+    #         ###
+    #         predicted_labels = self.model.get_predicted_labels(labels, test_mask)
+    #         #print(list(predicted_labels.size())[0])
+    #         _,golden_labels_test = torch.split(labels,[list(labels.size())[0]-list(predicted_labels.size())[0], list(predicted_labels.size())[0]])
+    #         #print("IN APP\n",labels,'\n',predicted_labels)
+    #         print("IN TEST FUNC--> predicted\n", self.model.get_predicted_labels(labels, test_mask))
+    #         ###
+    #     else:
+    #         acc = np.mean(self.accuracies)
+
+    #     print("\nTest Accuracy {:.4f}".format(acc))
+
+    #     return acc,predicted_labels,golden_labels_test

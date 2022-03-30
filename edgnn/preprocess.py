@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 import inspect
 import argparse
 import importlib
 
 
-MODULE = 'core.data.{}'
+MODULE = 'edgnn.core.data.{}'
 PREPROCESS_FN = 'preprocess_{}'
 AVAILABLE_DATASETS = {
     'dglrgcn',

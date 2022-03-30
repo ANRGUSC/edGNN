@@ -1,5 +1,5 @@
 import numpy as np
-from utils.io import save_checkpoint
+from .io import save_checkpoint
 
 
 class EarlyStopping:

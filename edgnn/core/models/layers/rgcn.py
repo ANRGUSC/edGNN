@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import dgl.function as fn
 
-from core.models.constants import GNN_EDGE_LABELS_KEY, GNN_EDGE_NORM, GNN_MSG_KEY, GNN_NODE_FEAT_IN_KEY
+from edgnn.core.models.constants import GNN_EDGE_LABELS_KEY, GNN_EDGE_NORM, GNN_MSG_KEY, GNN_NODE_FEAT_IN_KEY
 
 
 class RGCNLayer(nn.Module):
