@@ -2,6 +2,7 @@
 """
 Run model script.
 """
+from typing import Dict, List
 import torch
 import importlib
 
@@ -16,13 +17,7 @@ import random
 import networkx as nx
 
 import time
-import sys
-
 import pathlib
-
-for p in sys.path:
-    print(p)
-
 import networkx as nx
 
 
@@ -604,7 +599,12 @@ AVAILABLE_DATASETS = {
     'dortmund'
 }
 
-def find_schedule(num_of_all_machines ,num_node ,input_given_speed,input_given_comm,input_given_comp,input_given_task_graph):
+def find_schedule(num_of_all_machines: int,
+                  num_node: int,
+                  input_given_speed: torch.Tensor,
+                  input_given_comm: torch.Tensor,
+                  input_given_comp: torch.Tensor,
+                  input_given_task_graph: Dict[int, List[int]]) -> torch.Tensor:
       
     prob = 0.25
     #min_deg,max_deg,min_width,max_width,depth = 2,2,10,10,10#2,3,5,5,7
